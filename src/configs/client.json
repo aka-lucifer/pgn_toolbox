@@ -1,0 +1,30 @@
+{
+    "debug": false,
+    "maxJailTime": 2700,
+    "adverts": [
+        {"name": "24/7", "dictionary": "CHAR_FLOYD", "file": "247"},
+        {"name": "Ammunation", "dictionary": "CHAR_AMMUNATION", "file": "CHAR_AMMUNATION"},
+        {"name": "Bugstars", "dictionary": "CHAR_BUGSTARS", "file": "CHAR_BUGSTARS"},
+        {"name": "Cluckin Bell", "dictionary": "CHAR_FLOYD", "file": "BELL"},
+        {"name": "Downtown Cab Co.", "dictionary": "CHAR_TAXI", "file": "CHAR_TAXI"},
+        {"name": "Dynasty 8", "dictionary": "CHAR_FLOYD", "file": "D8"},
+        {"name": "Fleeca Bank", "dictionary": "CHAR_BANK_FLEECA", "file": "CHAR_BANK_FLEECA"},
+        {"name": "Gruppe6", "dictionary": "CHAR_FLOYD", "file": "GRUPPE6"},
+        {"name": "Merry Weather", "dictionary": "CHAR_MP_MERRYWEATHER", "file": "CHAR_MP_MERRYWEATHER"},
+        {"name": "Limited Gasoline", "dictionary": "CHAR_FLOYD", "file": "LTD"},
+        {"name": "Liquor Ace", "dictionary": "CHAR_FLOYD", "file": "ACE"},
+        {"name": "Smoke on the Water", "dictionary": "CHAR_FLOYD", "file": "SOTW"},
+        {"name": "Pegasus", "dictionary": "CHAR_PEGASUS_DELIVERY", "file": "CHAR_PEGASUS_DELIVERY"},
+        {"name": "Los Santos Customs", "dictionary": "CHAR_LS_CUSTOMS", "file": "CHAR_LS_CUSTOMS"},
+        {"name": "Los Santos Traffic Info", "dictionary": "CHAR_LS_TOURIST_BOARD", "file": "CHAR_LS_TOURIST_BOARD"},
+        {"name": "Los Santos Water and Power", "dictionary": "CHAR_FLOYD", "file": "LSWP"},
+        {"name": "Mors Mutual Insurance", "dictionary": "CHAR_MP_MORS_MUTUAL", "file": "CHAR_MP_MORS_MUTUAL"},
+        {"name": "PostOP", "dictionary": "CHAR_FLOYD", "file": "OP"},
+        {"name": "Vanilla Unicorn", "dictionary": "CHAR_MP_STRIPCLUB_PR", "file": "CHAR_MP_STRIPCLUB_PR"},
+        {"name": "Weazel News", "dictionary": "CHAR_FLOYD", "file": "NEWS"},
+        {"name": "Facebook", "dictionary": "CHAR_FACEBOOK", "file": "CHAR_FACEBOOK"},
+        {"name": "Life Invader", "dictionary": "CHAR_LIFEINVADER", "file": "CHAR_LIFEINVADER"},
+        {"name": "YouTube", "dictionary": "CHAR_YOUTUBE", "file": "CHAR_YOUTUBE"}
+    ],
+    "repairDisabler": false
+}
