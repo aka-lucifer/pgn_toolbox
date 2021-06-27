@@ -281,13 +281,15 @@ export class Client {
         this.shieldData.created = newState;
 
         if (this.shieldData.created) {
-          console.log("make shield!");
-          if (HasAnimDictLoaded("weapons@pistol_1h@gang")) {
-            Utils.loadAnimation("weapons@pistol_1h@gang");
+          // if (!HasAnimDictLoaded("combat@gestures@gang@pistol_1h@beckon")) {
+          //   Utils.loadAnimation("combat@gestures@gang@pistol_1h@beckon");
+          // }
+          RequestAnimDict('combat@gestures@gang@pistol_1h@beckon')
+          while (!HasAnimDictLoaded('combat@gestures@gang@pistol_1h@beckon')) {
+            await Utils.Delay(100)
           }
 
-          TaskPlayAnim(Game.PlayerPed.Handle, "weapons@pistol_1h@gang", "aim_med_loop", 8.0, -8.0, -1, (2 + 16 + 32), 0.0, false, false, false);
-
+          TaskPlayAnim(Game.PlayerPed.Handle, 'combat@gestures@gang@pistol_1h@beckon', '0', 8.0, -8.0, -1, (2 + 16 + 32), 0.0, false, false, false);
           const shield = new Model("prop_ballistic_shield");
           shield.request(5000);
 
@@ -295,24 +297,22 @@ export class Client {
           this.shieldData.prop.IsPersistent = true;
           this.shieldData.prop.IsInvincible = true;
           AttachEntityToEntity(this.shieldData.prop.Handle, Game.PlayerPed.Handle, GetEntityBoneIndexByName(Game.PlayerPed.Handle, 'IK_L_Hand'), 0.0, -0.05, -0.10, -30.0, 180.0, 40.0, false, false, true, false, 0, true);
-          SetWeaponAnimationOverride(Game.PlayerPed.Handle, "Gang1H");
-          this.shieldData.tick = setTick(async() => {
-            DisableControlAction(0, Control.Aim, true);
-            if (IsPedShooting(Game.PlayerPed.Handle) || IsPlayerFreeAiming(Game.Player.Handle)) {
-              if (IsEntityPlayingAnim(Game.PlayerPed.Handle, "weapons@pistol_1h@gang", "aim_med_loop", 3)) {
-                ClearPedTasks(Game.PlayerPed.Handle);
-              }
-            } else {
-              if (!IsEntityPlayingAnim(Game.PlayerPed.Handle, "weapons@pistol_1h@gang", "aim_med_loop", 3)) {
-                TaskPlayAnim(Game.PlayerPed.Handle, "weapons@pistol_1h@gang", "aim_med_loop", 8.0, -8.0, -1, (2 + 16 + 32), 0.0, false, false, false);
-              }
-            }
-          })
+          SetWeaponAnimationOverride(Game.PlayerPed.Handle, 'Gang1H')
+
+          if (HasPedGotWeapon(Game.PlayerPed.Handle, GetHashKey("WEAPON_COMBATPISTOL"), false)) {
+            SetCurrentPedWeapon(Game.PlayerPed.Handle, GetHashKey("WEAPON_COMBATPISTOL"), true);
+          } else {
+            const [bool, maxWeapAmmo] = GetMaxAmmo(Game.PlayerPed.Handle, WeaponHash.CombatPistol);
+            Game.PlayerPed.giveWeapon(WeaponHash.CombatPistol, maxWeapAmmo, false, true);
+          }
+
+          SetEnableHandcuffs(Game.PlayerPed.Handle, true);
         } else {
           clearTick(this.shieldData.tick);
           this.shieldData.prop.delete();
           ClearPedTasks(Game.PlayerPed.Handle);
           SetWeaponAnimationOverride(Game.PlayerPed.Handle, "Default");
+          SetEnableHandcuffs(Game.PlayerPed.Handle, false);
         }
       });
 
