@@ -167,6 +167,9 @@ export class Client {
     // Menu Handler
     RegisterKeyMapping("+-open_pgn_menu", "Opens the PGN Interaction Menu", "keyboard", "f5");
 
+    RegisterCommand("+handsup", async() => {if (!IsPedInAnyVehicle(Game.PlayerPed.Handle, false)) { await this.ToggleHands() } }, false);
+    RegisterKeyMapping("+handsup", "Toggles your characters hands up", "keyboard", "H")
+
     RegisterCommand("+-open_pgn_menu", async() => {
       this.vehicle = Game.Player.Character.CurrentVehicle;
       const menu = new Menu("Im a fat cunt and my name is tyler", GetCurrentResourceName(), "middle-right");
@@ -200,7 +203,7 @@ export class Client {
       policeActions.Button("Jail Player", async() => {
         this.jailID = parseInt(await Utils.KeyboardInput("Server ID", 4));
         if (this.jailID && this.jailID > 0) {
-          console.log(`Player ID: ${GetPlayerFromServerId(this.jailID)}`);
+          if (this.Debugging) console.log(`Player ID: ${GetPlayerFromServerId(this.jailID)}`);
           if (GetPlayerFromServerId(this.jailID) > 0) {
             this.jailTime = parseInt(await Utils.KeyboardInput("Seconds", 10));
             if (this.jailTime && this.jailTime > 0) {
@@ -376,62 +379,7 @@ export class Client {
       const civActions = civMenu.Submenu("Actions")
       
       const handsUp = civActions.Checkbox("Hands Up", this.handsData.state ? this.handsData.state == "START_HANDS" || this.handsData.state == "HANDS_UP" : false, async(newState) => {
-        if (this.handsData.state != "START_KNEELING" && this.handsData.state != "KNEELING") {
-          if (this.handsData.state == "DOWN" || this.handsData.state == null) {
-            this.handsData.state = "START_HANDS";
-            // Game.Player.Character.giveWeapon(WeaponHash.Unarmed, 0, false, true); // Makes them unarmed
-            await Utils.loadAnimation("rcmminute2");
-  
-            TaskPlayAnim(Game.Player.Character.Handle, "rcmminute2", "arrest_walk", 2.0, 1.0, -1, 49, 1.0, false, false, false);
-            this.handsData.state = "HANDS_UP";
-  
-            this.handsData.tick = setTick(() => {
-              if (this.vehicle && this.vehicle.exists) {
-                DisableControlAction(0, 24, true); // Attack
-                DisableControlAction(0, 257, true); // Attack 2
-                DisableControlAction(0, 71, true); // accelerate
-                DisableControlAction(0, 72, true); // brake/reverse
-                DisableControlAction(0, 74, true); // headlight
-                DisableControlAction(0, 63, true); // steer l
-                DisableControlAction(0, 64, true); // steer r
-                DisableControlAction(0, 59, true); // steer r
-                DisableControlAction(0, 278, true); // steer r
-                DisableControlAction(0, 279, true); // steer r
-                DisableControlAction(0, 68, true); // driveby aim
-                DisableControlAction(0, 69, true); // driveby fire_flames
-                DisableControlAction(0, 76, true); // handbrake
-                DisableControlAction(0, 102, true); // handbrake		
-                DisableControlAction(0, 81, true); // RadioNext
-                DisableControlAction(0, 82, true); // RadioPrevious
-                DisableControlAction(0, 83, true); // RadioPCNext
-                DisableControlAction(0, 84, true); // RadioPCPrevious
-                DisableControlAction(0, 85, true); // RadioWheel 
-                DisableControlAction(0, 86, true); // horn
-                DisableControlAction(0, 106, true); // mouse drive
-                DisableControlAction(0, 102, true); // veh jump
-              } else {
-                DisableControlAction(0, 24, true); // Attack
-                DisableControlAction(0, 257, true); // Attack 2
-                DisableControlAction(0, 22, true); // jump
-                DisableControlAction(0, 24, true); // fire_flames
-                DisableControlAction(0, 25, true); // aim
-                DisableControlAction(0, 36, true); // stealth
-                DisableControlAction(0, 45, true); // reload
-                DisableControlAction(0, 47, true); // det grenade
-                DisableControlAction(0, 140, true); // melee lt
-                DisableControlAction(0, 141, true); // melee hvy
-                DisableControlAction(0, 143, true); // melee dodge
-                DisableControlAction(0, 142, true); // idk
-              }
-            })
-          } else {
-            StopAnimTask(Game.Player.Character.Handle, "rcmminute2", "arrest_walk", 1.0);
-            this.handsData.state = "DOWN"
-            clearTick(this.handsData.tick);
-          }
-        } else {
-          Utils.showNotification("~r~You can't put your hands up, whilst kneeling down!");
-        }
+        await this.ToggleHands();
       })
       
       civActions.Checkbox("Kneel With Hands", this.handsData.state ? this.handsData.state == "START_KNEELING" || this.handsData.state == "KNEELING" : false, async(newState) => {
@@ -567,19 +515,19 @@ export class Client {
         })
 
         // Doors
-        console.log(GetNumberOfVehicleDoors(this.vehicle.Handle))
+        if (this.Debugging) console.log(`Door Amount: ${GetNumberOfVehicleDoors(this.vehicle.Handle)}`);
         if (GetNumberOfVehicleDoors(this.vehicle.Handle) <= 8) { // If the vehicle has 4 doors or less (6 is hood / trunk)
           const frontLeftDoor = GetEntityBoneIndexByName(this.vehicle.Handle, Bones.DriverDoor);
           const frontRightDoor = GetEntityBoneIndexByName(this.vehicle.Handle, Bones.PassengerDoor);
           const rearLeftDoor = GetEntityBoneIndexByName(this.vehicle.Handle, Bones.LeftRearDoor);
           const rearRightDoor = GetEntityBoneIndexByName(this.vehicle.Handle, Bones.RightRearDoor);
   
-          console.log(`Doors: ${GetNumberOfVehicleDoors(this.vehicle.Handle)} | ${frontLeftDoor} | ${frontRightDoor} | ${rearLeftDoor} | ${rearRightDoor}`);
+          if (this.Debugging) console.log(`Doors: ${GetNumberOfVehicleDoors(this.vehicle.Handle)} | ${frontLeftDoor} | ${frontRightDoor} | ${rearLeftDoor} | ${rearRightDoor}`);
   
           if (frontLeftDoor != -1 && frontRightDoor != -1) {
-            console.log("HAS FRONT DOORS!");
+            if (this.Debugging) console.log("HAS FRONT DOORS!");
             if (rearLeftDoor != -1 && rearRightDoor != -1) {
-              console.log("HAS READ DOORS!");
+              if (this.Debugging) console.log("HAS READ DOORS!");
               vehMenu.List("Door", ["Front Left", "Front Right", "Rear Left", "Rear Right", "Boot", "Bonnet"], (itemIndex) => {
                 if (itemIndex == 0) {
                   this.ToggleDoor(Doors.Driver)
@@ -614,7 +562,7 @@ export class Client {
         // Seats
         const vehSeats = [];
         for (let i = -1; i < (GetVehicleModelNumberOfSeats(this.vehicle.Model.Hash)) - 1; i++) {
-          console.log(i);
+          if (this.Debugging) console.log(`Seat Index: ${i}`);
           vehSeats.push(i);
         }
         
@@ -751,16 +699,12 @@ export class Client {
   }
 
   private EVENT_Sync(connectedPlayers: any[]): void {
-    if (this.debug) {
-      console.log(`Syncing Players: [${connectedPlayers.length}]: ${JSON.stringify(connectedPlayers)}`);
-    }
+    if (this.Debugging) console.log(`Syncing Players: [${connectedPlayers.length}]: ${JSON.stringify(connectedPlayers)}`);
     this.players = connectedPlayers;
   }
 
   private EVENT_UpdateProps(worldProps: WorldProp[]) {
-    if (this.debug) {
-      console.log(`Updating Props: ${JSON.stringify(worldProps)}`);
-    }
+    if (this.Debugging) console.log(`Updating Props: ${JSON.stringify(worldProps)}`);
 
     if (worldProps != null) {
       propManager.SetProps = worldProps;
@@ -856,7 +800,7 @@ export class Client {
 
   private ToggleDoor(doorId: number): void {
     const open = GetVehicleDoorAngleRatio(this.vehicle.Handle, doorId) > 0 ? true : false;
-    console.log(`Direction: ${open.toString()}`);
+    if (this.Debugging) console.log(`Door Direction: ${open.toString()}`);
     if (open) {
       SetVehicleDoorShut(this.vehicle.Handle, doorId, false);
     } else {
@@ -949,6 +893,71 @@ export class Client {
       prop.data.IsInvincible = true;
       
       emitNet(Events.syncProps, propManager.GetProps);
+    }
+  }
+
+  private async ToggleHands(): Promise<void> {
+    if (this.handsData.state != "START_KNEELING" && this.handsData.state != "KNEELING") {
+      if (this.handsData.state == "DOWN" || this.handsData.state == null) {
+        this.handsData.state = "START_HANDS";
+        // Game.Player.Character.giveWeapon(WeaponHash.Unarmed, 0, false, true); // Makes them unarmed
+        await Utils.loadAnimation("rcmminute2");
+
+        TaskPlayAnim(Game.Player.Character.Handle, "rcmminute2", "arrest_walk", 2.0, 1.0, -1, 49, 1.0, false, false, false);
+        this.handsData.state = "HANDS_UP";
+
+        this.handsData.tick = setTick(() => {
+          if (this.handsData.state == "HANDS_UP" && !IsEntityPlayingAnim(Game.Player.Character.Handle, "rcmminute2", "arrest_walk", 3) || this.handsData.state == "KNEELING" && !IsEntityPlayingAnim(Game.PlayerPed.Handle, "random@arrests", "kneeling_arrest_idle", 3)) { // Handles removing hands up disable controls, if you hands are no longer up.
+            ClearPedTasks(Game.PlayerPed.Handle);
+            this.handsData.state = "DOWN";
+            clearTick(this.handsData.tick);
+          }
+
+          if (this.vehicle && this.vehicle.exists) {
+            DisableControlAction(0, 24, true); // Attack
+            DisableControlAction(0, 257, true); // Attack 2
+            DisableControlAction(0, 71, true); // accelerate
+            DisableControlAction(0, 72, true); // brake/reverse
+            DisableControlAction(0, 74, true); // headlight
+            DisableControlAction(0, 63, true); // steer l
+            DisableControlAction(0, 64, true); // steer r
+            DisableControlAction(0, 59, true); // steer r
+            DisableControlAction(0, 278, true); // steer r
+            DisableControlAction(0, 279, true); // steer r
+            DisableControlAction(0, 68, true); // driveby aim
+            DisableControlAction(0, 69, true); // driveby fire_flames
+            DisableControlAction(0, 76, true); // handbrake
+            DisableControlAction(0, 102, true); // handbrake		
+            DisableControlAction(0, 81, true); // RadioNext
+            DisableControlAction(0, 82, true); // RadioPrevious
+            DisableControlAction(0, 83, true); // RadioPCNext
+            DisableControlAction(0, 84, true); // RadioPCPrevious
+            DisableControlAction(0, 85, true); // RadioWheel 
+            DisableControlAction(0, 86, true); // horn
+            DisableControlAction(0, 106, true); // mouse drive
+            DisableControlAction(0, 102, true); // veh jump
+          } else {
+            DisableControlAction(0, 24, true); // Attack
+            DisableControlAction(0, 257, true); // Attack 2
+            DisableControlAction(0, 22, true); // jump
+            DisableControlAction(0, 24, true); // fire_flames
+            DisableControlAction(0, 25, true); // aim
+            DisableControlAction(0, 36, true); // stealth
+            DisableControlAction(0, 45, true); // reload
+            DisableControlAction(0, 47, true); // det grenade
+            DisableControlAction(0, 140, true); // melee lt
+            DisableControlAction(0, 141, true); // melee hvy
+            DisableControlAction(0, 143, true); // melee dodge
+            DisableControlAction(0, 142, true); // idk
+          }
+        })
+      } else {
+        StopAnimTask(Game.Player.Character.Handle, "rcmminute2", "arrest_walk", 1.0);
+        this.handsData.state = "DOWN"
+        clearTick(this.handsData.tick);
+      }
+    } else {
+      Utils.showNotification("~r~You can't put your hands up, whilst kneeling down!");
     }
   }
 }
