@@ -60,29 +60,19 @@ export class Server {
 
     // DEFAULT EVENTS
     private EVENT_PlayerLoaded(): void {
-        if (this.Debugging) {
-            console.log(`Adding player on (playerLoaded) event!`);
-        }
-        
+        if (this.Debugging) console.log(`Adding player on (playerLoaded) event!`);
         playerManager.Add(new Player(source));
 
-        if (this.Debugging) {
-            console.log(`Added player on (playerLoaded) event! | ${JSON.stringify(playerManager.GetPlayers)}`);
-        }
+        if (this.Debugging) console.log(`Added player on (playerLoaded) event! | ${JSON.stringify(playerManager.GetPlayers)}`);
         emitNet(Events.syncPlayers, -1, playerManager.GetPlayers);
     }
 
     private EVENT_PlayerDropped(): void {
         const player = new Player(source);
-        if (this.Debugging) {
-            console.log(`Removing player on (playerDropped) event!`);
-        }
-
+        if (this.Debugging) console.log(`Removing player on (playerDropped) event!`);
         playerManager.Remove(player.GetHandle);
 
-        if (this.Debugging) {
-            console.log(`Removed player on (playerLoaded) event! | ${JSON.stringify(playerManager.GetPlayers)}`);
-        }
+        if (this.Debugging) console.log(`Removed player on (playerLoaded) event! | ${JSON.stringify(playerManager.GetPlayers)}`);
         emitNet(Events.syncPlayers, -1, playerManager.GetPlayers);
     }
 
@@ -158,7 +148,7 @@ export class Server {
                 }
             }
         } else {
-            console.log("There was a problem with the passed vehicles network ID!");
+            if (this.Debugging) console.log("There was a problem with the passed vehicles network ID!");
         }
     }
     
@@ -218,9 +208,7 @@ export class Server {
     private async EVENT_Hospitalize(playerIndex: number): Promise<void> {
         const foundPlayer = playerManager.GetPlayers[playerIndex];
         if (foundPlayer) {
-            if (this.Debugging) {
-                console.log(`Found Player: ${JSON.stringify(foundPlayer)}`);
-            }
+            if (this.Debugging) console.log(`Found Player: ${JSON.stringify(foundPlayer)}`);
             
             const player = new Player(source);
             const done = await this.WebhookLog("Player Hospitalized", `${player.Name} hospitalized ${foundPlayer.Name}`, foundPlayer);
@@ -229,9 +217,7 @@ export class Server {
                 for (let i = 0; i < closestHospital.beds.length; i++) {
                     if (!closestHospital.beds[i].taken) {
                         closestHospital.beds[i].taken = true;
-                        if (this.Debugging) {
-                            console.log(`Chosen Bed Is - ${JSON.stringify(closestHospital.beds[i])}`);
-                        }
+                        if (this.Debugging) console.log(`Chosen Bed Is - ${JSON.stringify(closestHospital.beds[i])}`);
                         
                         // SetEntityCoords(GetPlayerPed(foundPlayer.GetHandle), closestHospital.beds[i].x, closestHospital.beds[i].y, closestHospital.beds[i].z, false, false, false, false);
                         foundPlayer.TriggerEvent(Events.getHospitalized, closestHospital, closestHospital.beds[i]);
@@ -249,9 +235,7 @@ export class Server {
     private EVENT_ExitBed(hospitalData: Record<string, any>, bedData: Record<string, any>): void {
         const hospitalIndex = this.hospitals.findIndex(hospital => hospital.type == hospitalData.type);
         if (this.hospitals[hospitalIndex]) {
-            if (this.Debugging) {
-                console.log(`Found Hospital: ${JSON.stringify(this.hospitals[hospitalIndex])}`);
-            }
+            if (this.Debugging) console.log(`Found Hospital: ${JSON.stringify(this.hospitals[hospitalIndex])}`);
             
             const bedIndex = this.hospitals[hospitalIndex].beds.findIndex(bed => bed.x == bedData.x && bed.y == bedData.y && bedData.z && bed.heading == bedData.heading);
             if (this.hospitals[hospitalIndex].beds[bedIndex]) {
@@ -262,9 +246,7 @@ export class Server {
                 
                 this.hospitals[hospitalIndex].beds[bedIndex].taken = false;
 
-                if (this.Debugging) {
-                    console.log(`Bed 2: ${this.hospitals[hospitalIndex].beds[bedIndex].taken}`);
-                }
+                if (this.Debugging) console.log(`Bed 2: ${this.hospitals[hospitalIndex].beds[bedIndex].taken}`);
             }
         }
     }
@@ -356,9 +338,7 @@ export class Server {
             }
         });
 
-        if (this.Debugging) {
-            console.log(`Hospital Data - Entry: ${JSON.stringify(closestHospital)} | Dist: ${closestDistance}`);
-        }
+        if (this.Debugging) console.log(`Hospital Data - Entry: ${JSON.stringify(closestHospital)} | Dist: ${closestDistance}`);
 
         return closestHospital;
     }
